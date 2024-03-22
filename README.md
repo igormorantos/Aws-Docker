@@ -23,3 +23,4 @@ Ponto adicional para o trabalho utilizar a instalação via script de Start Inst
 - Necessário demonstrar a aplicação wordpress funcionando (tela de login)
 - Aplicação Wordpress precisa estar rodando na porta 80 ou 8080;
 - Utilizar repositório gitpara versionamento;
+
