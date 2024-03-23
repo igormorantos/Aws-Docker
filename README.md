@@ -26,6 +26,8 @@ Ponto adicional para o trabalho utilizar a instalação via script de Start Inst
 
 <h3>Configuração da VPC</h3>
 
+![1](https://github.com/igormorantos/Aws-Docker/assets/94862012/b98bcccd-e81e-4461-beef-669b1baa192d)
+
 <h4>Configuração das sub-redes</h4>
 
 utilizei a VPC `aws-docker`, usaremos 4 sub-redes, sendo 2 privadas, que contém a instância da aplicação, e a outra pública, que contém a instância do bastion em diferentes zonas de disponibilidades. Então, navegue para seção de sub-redes.
