@@ -62,3 +62,12 @@ Para uma instância privada obter acesso a internet para baixar/instalar alguns 
     - `Sub-rede: aws-docker-private-subnet-wp, aws-docker-private-subnet-wp2`
     - `Conectividade: Público`
     - `IP elástico: alocar IP elástico`
+
+ <h4>Pares de Chave</h4>
+
+é nescessario criar um par chaves para acessar as instancias EC2.
+- Par de Chaves
+    - `Nome: aws-docker.pem`
+    - `Tipo: RSA`
+    
+
