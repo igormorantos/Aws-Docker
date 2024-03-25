@@ -79,4 +79,5 @@ Para uma instância privada obter acesso a internet para baixar/instalar alguns 
     - `VPC: aws-docker`
     - `Par Chaves: aws-docker.pem`
     - `Tipo da instância: t2.micro`
+    - `subnet: aws-docker-public-subnet-1a`
     
