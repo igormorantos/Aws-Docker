@@ -70,4 +70,13 @@ Para uma instância privada obter acesso a internet para baixar/instalar alguns 
     - `Nome: aws-docker.pem`
     - `Tipo: RSA`
     
+ <h4>Criando instancias</h4>
 
+<h5>Criando as instancias Ec2 host e de aplicação.</h5>
+
+- Configuração das instancias host
+    - `AMI: Linux 2`
+    - `VPC: aws-docker`
+    - `Par Chaves: aws-docker.pem`
+    - `Tipo da instância: t2.micro`
+    
