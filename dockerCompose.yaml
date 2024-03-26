@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "80:80"
+
+    environment:
+      WORDPRESS_DB_HOST: 
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: admin123
+      WORDPRESS_DB_NAME: aws_docker_project
+
+    volumes:
+      - /mnt/efs/wordpress:/var/www/html
