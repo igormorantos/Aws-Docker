@@ -24,7 +24,7 @@ Ponto adicional para o trabalho utilizar a instalação via script de Start Inst
 - Aplicação Wordpress precisa estar rodando na porta 80 ou 8080;
 - Utilizar repositório gitpara versionamento;
 
-<h3>Configuração da VPC</h3>
+## Configuração da VPC
 
 ![1](https://github.com/igormorantos/Aws-Docker/assets/94862012/b98bcccd-e81e-4461-beef-669b1baa192d)
 
@@ -63,14 +63,14 @@ Para uma instância privada obter acesso a internet para baixar/instalar alguns 
     - `Conectividade: Público`
     - `IP elástico: alocar IP elástico`
 
- <h4>Pares de Chave</h4>
+## Pares de Chave
 
 é nescessario criar um par chaves para acessar as instancias EC2.
 - Par de Chaves
     - `Nome: aws-docker.pem`
     - `Tipo: RSA`
     
- <h4>Criando instancias</h4>
+## Criando instancias
 
 <h5>Criando as instancias Ec2 host e de aplicação.</h5>
 
@@ -80,4 +80,49 @@ Para uma instância privada obter acesso a internet para baixar/instalar alguns 
     - `Par Chaves: aws-docker.pem`
     - `Tipo da instância: t2.micro`
     - `subnet: aws-docker-public-subnet-1a`
-    
+
+## Load Balancer
+
+<h6>Como Solicitado nos pontos de atenção o load balancer criado é o classic.</h6>
+
+ - Passo a passo de criação do load balancer classic:
+
+ - ` Ir para a seção de load balancers na AWS`
+ - ` Clicar em criar lod balancer`
+ - ` Selecionar o tipo de "Classic Load Balancer`
+ - ` Escolha o nome do load balancer`
+ - ` Selecionar o esquema "Voltado para internet`
+ - ` Selecionar a VPC`
+ - ` Selecionar as subnets públicas de cada zona`
+ - ` Selecionar grupo de segurança para o load balancer`
+
+## EFS
+
+Para criar o Elastic File System, basta:
+
+ - `Ir em Criar sistema de arquivo`
+ - `Criar nome do EFS`
+ - `Escolher a vpc`
+ - `Ir no FS criado`
+ - `Visualizar detalhes`
+ - `Ir em redes`
+ - `escolher o grupode segurança determinado`
+
+## RDS
+
+O RDS foi configurado seguindo as etapas:
+
+ - `Entrar em RDS.`
+ - `Clicar em Criar Banco de dados`
+ - `Selecionar de criação padrão`
+ - `Selecionar o banco MySQL`
+ - `Selecionar o modelo free tier`
+ - `Solicitar Disponibilidade e durabilidade Cluster de banco de dados Multi-AZ`
+ - `Escolher o nome do banco de dados`
+ - `Escolher nome do usuário e senha`
+ - `Escolher configuração de instância foi "db.m5d.large"`
+ - `Em conectividade marcar opção "não se conectar a um recurso de computação do EC2"`
+ - `Escolher a VPC criada anteriormente`
+ - `Escolher grupo de sub-redes`
+ - `Utilizar grupo de segurança criado para o RDS`
+ - `Selecionar a zona de disponibilidade como "Sem preferência`
