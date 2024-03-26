@@ -13,7 +13,7 @@ Ponto adicional para o trabalho utilizar a instalação via script de Start Inst
 
 - configuração do serviço de Load Balancer AWS para a aplicação Wordpress
 
-<h3>Arquitetura</h3>
+## Arquitetura:
 ![1](https://github.com/igormorantos/Aws-Docker/assets/94862012/28b3e75c-be2a-4826-9a4c-7e924adcb33f)
 
 
