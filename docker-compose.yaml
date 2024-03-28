@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: aws-docker-rds1.c7i4k6wwgmzc.us-east-1.rds.amazonaws.com
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: admin123
+      WORDPRESS_DB_NAME: aws_docker_rds
+    volumes:
+      - /efs/wordpress
