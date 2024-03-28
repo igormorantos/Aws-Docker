@@ -6,9 +6,9 @@ services:
     ports:
       - "80:80"
     environment:
-      WORDPRESS_DB_HOST: aws-docker-rds1.c7i4k6wwgmzc.us-east-1.rds.amazonaws.com
+      WORDPRESS_DB_HOST: aws-docker-3.c7i4k6wwgmzc.us-east-1.rds.amazonaws.com
       WORDPRESS_DB_USER: admin
       WORDPRESS_DB_PASSWORD: admin123
-      WORDPRESS_DB_NAME: aws_docker_rds
+      WORDPRESS_DB_NAME: aws_docker
     volumes:
       - /efs/wordpress
