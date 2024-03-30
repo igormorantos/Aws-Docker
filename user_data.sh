@@ -1,31 +1,41 @@
 #!/bin/bash
-# Responsável por atualizar o sistema
+
+# Atualização do sistema
 sudo yum update -y
-# Instalar o docker
+
+# Instalação do Docker
 sudo yum install docker -y
-# Inicializar o docker
+
+# Ativação do serviço Docker
 sudo systemctl start docker
-# Habilitar o docker juntamente do início da instância
 sudo systemctl enable docker
-# Dar um curl no docker-compose
+
+# Instalação do Docker Compose
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-# Dar permissões necessárias
 sudo chmod +x /usr/local/bin/docker-compose
-# Dar um curl no arquivo .yaml do meu git-hub e criar um arquivo de mesmo nome contendo seu conteúdo
-sudo curl -o dockerCompose.yaml "https://raw.githubusercontent.com/igormorantos/Aws-Docker/blob/main/docker-compose.yaml"
-# Instalar cliente nfs 
-sudo sudo yum install -y amazon-efs-utils
-# Criar diretório para montagem
+
+# Criação do ponto de montagem EFS (opcional)
 sudo mkdir /efs
-# Dar permissões necessárias ao diretório ( leitura, escrita e execução ) 
 sudo chmod +rwx /efs
-# Montar o sistema de arquivos com o EFS
-sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0c2450fab7143e6e8.efs.us-east-1.amazonaws.com:/ /efs
-# Habilitar montagem automatica quando a máquina inicializar
-echo "fs-0c2450fab7143e6e8.efs.us-east-1.amazonaws.com:/ /efs nfs defaults 0 0" >> /etc/fstab
-# Adicionar o usuário atual no grupo do docker
-usermod -aG docker ${USER}
-# Dar permissão de leitura e escrita no docker.sock
-chmod 666 /var/run/docker.sock
-# Criar o container com docker-compose utilizando a imagem do .yaml
-docker-compose -f /home/ec2-user/docker-compose.yaml up -d
+
+sudo yum install amazon-efs-utils -y
+
+sudo yum install python3-pip -y
+
+sudo pip3 install botocore
+
+# Montagem do EFS (opcional)
+# Substitua "fs-0c2450fab7143e6e8.efs.us-east-1.amazonaws.com" pelo ID do seu EFS
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 172.29.0.120:/ /efs
+
+# Download do arquivo docker-compose.yaml
+sudo curl -o /home/ec2-user/dockerCompose.yaml "https://raw.githubusercontent.com/igormorantos/Aws-Docker/main/docker-compose.yaml"
+
+# Adição do usuário ao grupo Docker
+sudo usermod -aG docker ${USER}
+
+# Permissão para o socket do Docker
+sudo chmod 666 /var/run/docker.sock
+
+# Execução do Docker Compose
+sudo docker-compose -f /home/ec2-user/dockerCompose.yaml up -d
