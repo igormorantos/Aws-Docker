@@ -3,6 +3,8 @@ version: '3.8'
 services:
   wordpress:
     image: wordpress:latest
+    volumes:
+      - /efs/wordpress
     ports:
       - "80:80"
     environment:
@@ -10,5 +12,3 @@ services:
       WORDPRESS_DB_USER: admin
       WORDPRESS_DB_PASSWORD: admin123
       WORDPRESS_DB_NAME: aws_docker
-    volumes:
-      - /efs/wordpress
