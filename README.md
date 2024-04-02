@@ -117,7 +117,7 @@ Configurar 2 grupos de segurança, um para a instância e outro para o load bala
     - `Tipo da instância: t2.micro`
     - `subnet: aws-docker-1b`
 
-## Instalação Docker na instância
+## Instalando as Configurações e Subindo o Container Wordpress na instância
 
 Para fazer as instalações do docker/docker-compose/efs/container-wordpress
 
