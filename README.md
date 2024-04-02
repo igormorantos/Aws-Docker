@@ -227,3 +227,43 @@ O RDS foi configurado seguindo as etapas:
  - `Utilizar grupo de segurança criado para o RDS`
  - `Selecionar a zona de disponibilidade como "Sem preferência`
 
+### Grupos de destino
+
+Configurando o Grupo:
+
+ -`Ir para a os grupos de destino na AWS.`
+ - `Clicar em criar grupo de destino.`
+ - `Na configuração básica selecionar "instâncias"`
+ - `Criar um nome para o grupo de destino`
+ - Selecionar o protocolo:`HTTP` e a porta`8080`,
+ - O tipo de endereço IP será o `IPv4`
+ - Escolher a VPC `aws-docker`
+ - Escolher o caminho para verificação de integridade:`/` e o protocolo:`HTTP`.
+ - Realizar registro das instâncias.
+
+### Modelos de execução
+
+Para o modelo de execução, essas são as configurações:
+ - Amazon Linux 2
+ - t2.micro
+ - "Par de chaves" criada para a atividade
+ - Grupo de segurança seguindo o especificado nas seções anteriores
+ - Armazenamento do tipo GP2 com 8GB
+ - Utiliza um script de user_data para o modelo que sera uisado na sub-rede: `aws-docker-1a`
+ - E no caso da do modelo que sera usado na sub-rede: `aws-docker-1b` sera usado o user_data2
+
+## Autoscaling
+
+Para criar o autoscaling usaremos os modelos de execução criados anteriormente
+
+A configuração do autoscaling segue essas etapas:
+ - Ir para a seção de "Grupos do Auto Scaling
+ - Clicar em "criar grupo do Auto Scaling"
+ - Inserir nome do 
+ - Selecionar o launcher template criado
+ - Selecionar a VPC adequada
+ - Selecionar as subnets privadas que as instâncias serão criadas
+ - Em balanceador de carga, pode-se selecionar o já criado, ou criar posteriormente
+ - Habilitar coleta de métricas de grupo no CloudWatch ( É opcional )
+ - Selecionar a capacidade desejada, mínima e máxima como 2 
+
