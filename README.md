@@ -1,6 +1,6 @@
-<h1>Atividade AWS – Docker</h1>
+# Atividade AWS – Docker
 
-<h3>Objetivos:</h3>
+## Objetivos:
 
 - instalação e configuração do DOCKER ou CONTAINERD no host EC2;
 Ponto adicional para o trabalho utilizar a instalação via script de Start Instance (user_data.sh)
@@ -17,7 +17,7 @@ Ponto adicional para o trabalho utilizar a instalação via script de Start Inst
 ![1](https://github.com/igormorantos/Aws-Docker/assets/94862012/28b3e75c-be2a-4826-9a4c-7e924adcb33f)
 
 
-<h3>A Pontos de Atenção:</h3>
+## A Pontos de Atenção:
 
 - não utilizar ip público para saída do serviços WP (Evitem publicar o serviço WP via IP Público)
 - sugestão para o tráfego de internet sair pelo LB (Load Balancer Classic)
@@ -29,42 +29,52 @@ Ponto adicional para o trabalho utilizar a instalação via script de Start Inst
 
 ## Configuração da VPC
 
-![1](https://github.com/igormorantos/Aws-Docker/assets/94862012/b98bcccd-e81e-4461-beef-669b1baa192d)
+![1](https://github.com/igormorantos/Aws-Docker/assets/94862012/82c6220f-5233-4559-8390-1b419efe8470)
+
 
 <h4>Configuração das sub-redes</h4>
 
-utilizei a VPC `aws-docker`, usaremos 4 sub-redes, sendo 2 privadas, que contém a instância da aplicação, e a outra pública, que contém a instância do bastion em diferentes zonas de disponibilidades. Então, navegue para seção de sub-redes.
+utilizei a VPC `aws-docker`, usaremos 2 sub-redes, que contém a instância da aplicação em diferentes zonas de disponibilidades. que são:
 
-- Criando sub-redes privada
-    - `Nome: aws-docker-private-subnet-wp`
-    - `Zona de disponibilidade: us-east-1a`
-    - `CIDR: 172.29.0.0/24`
-   
-    - `Nome: aws-docker-private-subnet-wp2`
-    - `Zona de disponibilidade: us-east-1b`
-    - `CIDR: 172.29.4.0/24`
-
-- Criando sub-redes pública
-    - `Nome: aws-docker-public-subnet-1a`
+- Criando sub-redes públicas
+    - `Nome: aws-docker-1a`
     - `Zona de disponibilidade: us-east-1a`
     - `CIDR: 172.29.2.0/24`
 
-    - `Nome: aws-docker-public-subnet-1b`
+    - `Nome: aws-docker-1b`
     - `Zona de disponibilidade: us-east-1b`
     - `CIDR: 172.29.3.0/24`
 
-<h4>Configuração dos Gateways</h4>
+## Tabela de rotas
 
-Para uma instância privada obter acesso a internet para baixar/instalar alguns pacotes devemos utilizar um gateway NAT, o qual é associado a um gateway da internet. Então, navegue para seção de gateway.
+Criei uma tabela de roteamento, sendo ela para as duas sub-redes, onde vai permitir o tráfego à internet pelo gateway da internet.
 
+Criando a tabela de roteamento para sub-rede pública
+Nome: `rtb-aws-docker-public`
+VPC: `aws-docker`
+
+Após isso devemos associar as sub-redes criadas anteriormente a tabela de roteamento.
+
+
+## Associando as sub-redes pública a sua tabela de roteamento
+
+Selecione a tabela de roteamento, siga para associações de sub-redes e selecione Editar associações. Após isso, selecione a sub-rede pública, com nome: `aws-docker-1a` e clique salvar.
+
+Faça o mesmo para a `aws-docker-1b`
+
+Além disso, devemos também permitir o tráfego a internet para cada sub-rede, sendo pelo gateway da internet para sub-rede pública.
+
+## Configuração dos Gateways
+
+Para uma instância publica obter acesso a internet para baixar e instalar alguns pacotes devemos utilizar um gateway da internet, va até gateway internet para realizar a criação.
+
+Adicionando rota para gateway da internet na tabela de roteamento da sub-rede pública
+
+Selecione a tabela de roteamento, siga para rotas e selecione Editar rotas. Após isso, selecione adicionar rotas e preencha:
+  
 - Criando gateway da internet
     - `Nome: igateway-aws-docker`
-    
-- Criando gateway NAT
-    - `Nome: gatewayNat-wp`
-    - `Sub-rede: aws-docker-private-subnet-wp, aws-docker-private-subnet-wp2`
-    - `Conectividade: Público`
-    - `IP elástico: alocar IP elástico`
+    - `Alvo: 0.0.0.0/0`
 
 ## Pares de Chave
 
@@ -75,41 +85,129 @@ Para uma instância privada obter acesso a internet para baixar/instalar alguns 
     
 ## Criando instancias
 
+## Configuração do grupo de segurança
+
+Configurar 2 grupos de segurança, um para a instância e outro para o load balancer.
+
+- Grupo de segurança do balanceador de carga
+  Porta | Protocolo | Origem
+  --- | --- | ---
+  80  | TCP | 0.0.0.0/0
+
+- Grupo de segurança da aplicação
+  Porta | Protocolo | Origem 
+  --- | --- | ---
+  22 | TCP | "Seu Ip"
+  2049 | TCP | Grupo de Segurança do efs
+  80 | TCP | Grupo de segurança do balanceador de carga
+
 <h5>Criando as instancias Ec2 host e de aplicação.</h5>
 
-- Configuração das instancias host
+- Configuração das instancias host zona de disponibilidade 1a
     - `AMI: Linux 2`
     - `VPC: aws-docker`
     - `Par Chaves: aws-docker.pem`
     - `Tipo da instância: t2.micro`
-    - `subnet: aws-docker-public-subnet-1a`
+    - `subnet: aws-docker-1a`
+
+- Configuração das instancias host zona de disponibilidade 1b
+    - `AMI: Linux 2`
+    - `VPC: aws-docker`
+    - `Par Chaves: aws-docker.pem`
+    - `Tipo da instância: t2.micro`
+    - `subnet: aws-docker-1b`
+
+## Instalando as Configurações e Subindo o Container Wordpress na instância
+
+Para fazer as instalações do docker/docker-compose/efs/container-wordpress
+
+```#!/bin/bash
+#!/bin/bash
+
+# Variáveis
+EFS_VOLUME="/mnt/efs"
+WORDPRESS_VOLUME="/var/www/html"
+DATABASE_HOST="aws-docker1.c7i4k6wwgmzc.us-east-1.rds.amazonaws.com"
+DATABASE_USER="admin"
+DATABASE_PASSWORD="admin123"
+DATABASE_NAME="aws_docker"
+
+# Atualização do sistema
+sudo yum update -y
+
+# Instalação do Docker e do utilitário EFS
+sudo yum install docker -y
+sudo yum install amazon-efs-utils -y
+
+# Adição do usuário ao grupo Docker
+sudo usermod -aG docker $(whoami)
+
+# Inicialização e ativação do serviço Docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Criação do ponto de montagem EFS
+sudo mkdir -p $EFS_VOLUME
+
+# Montagem do volume EFS
+if ! mountpoint -q $EFS_VOLUME; then
+  echo "Montando volume EFS..."
+  sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 10.1.3.178:/ $EFS_VOLUME
+else
+  echo "Volume EFS já montado."
+fi
+
+# Download do Docker Compose
+curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /bin/docker-compose
+chmod +x /bin/docker-compose
+
+# Criação do arquivo docker-compose.yaml
+cat <<EOL > /home/ec2-user/docker-compose.yaml
+version: '3.8'
+services:
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - $EFS_VOLUME$WORDPRESS_VOLUME:/$WORDPRESS_VOLUME
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: $DATABASE_HOST
+      WORDPRESS_DB_USER: $DATABASE_USER
+      WORDPRESS_DB_PASSWORD: $DATABASE_PASSWORD
+      WORDPRESS_DB_NAME: $DATABASE_NAME
+EOL
+
+# Inicialização do serviço WordPress
+docker-compose -f /home/ec2-user/docker-compose.yaml up -d
+```
 
 ## Load Balancer
 
-<h6>Como Solicitado nos pontos de atenção o load balancer criado é o classic.</h6>
-
- - Passo a passo de criação do load balancer classic:
+<h6>Passo a passo de criação do load balancer </h6>
 
  - ` Ir para a seção de load balancers na AWS`
  - ` Clicar em criar lod balancer`
- - ` Selecionar o tipo de "Classic Load Balancer`
- - ` Escolha o nome do load balancer`
+ - ` Selecionar o tipo de "Application Load Balancer"`
+ - ` Escolha o nome do load balancer "aws-docker-lb"`
  - ` Selecionar o esquema "Voltado para internet`
- - ` Selecionar a VPC`
+ - ` Selecionar a VPC "aws-docker"`
  - ` Selecionar as subnets públicas de cada zona`
  - ` Selecionar grupo de segurança para o load balancer`
 
+    - `Nome: aws-docker-lb`
+    - `Esquema: voltado pra internet`
+    - `Tipo de endereço IP: IPv4`
+    - `VPC: aws-docker`
+    - `Grupo de segurança: "Load_balancer_SG"`
+
 ## EFS
 
-Para criar o Elastic File System, basta:
+Criando o Elastic File System:
 
  - `Ir em Criar sistema de arquivo`
- - `Criar nome do EFS`
- - `Escolher a vpc`
- - `Ir no FS criado`
- - `Visualizar detalhes`
- - `Ir em redes`
- - `escolher o grupode segurança determinado`
+ - `Criar nome do EFS: "efs-aws-docker"`
+ - `Escolher a vpc: "aws-docker"`
 
 ## RDS
 
@@ -119,13 +217,53 @@ O RDS foi configurado seguindo as etapas:
  - `Clicar em Criar Banco de dados`
  - `Selecionar de criação padrão`
  - `Selecionar o banco MySQL`
- - `Selecionar o modelo free tier`
- - `Solicitar Disponibilidade e durabilidade Cluster de banco de dados Multi-AZ`
+ - `Selecionar o modelo nível gratuito`
  - `Escolher o nome do banco de dados`
  - `Escolher nome do usuário e senha`
- - `Escolher configuração de instância foi "db.m5d.large"`
+ - `Escolher configuração de instância foi "db.t3.micro"`
  - `Em conectividade marcar opção "não se conectar a um recurso de computação do EC2"`
- - `Escolher a VPC criada anteriormente`
+ - `Escolher a VPC: aws-docker`
  - `Escolher grupo de sub-redes`
  - `Utilizar grupo de segurança criado para o RDS`
  - `Selecionar a zona de disponibilidade como "Sem preferência`
+
+### Grupos de destino
+
+Configurando o Grupo:
+
+ -`Ir para a os grupos de destino na AWS.`
+ - `Clicar em criar grupo de destino.`
+ - `Na configuração básica selecionar "instâncias"`
+ - `Criar um nome para o grupo de destino`
+ - Selecionar o protocolo:`HTTP` e a porta`8080`,
+ - O tipo de endereço IP será o `IPv4`
+ - Escolher a VPC `aws-docker`
+ - Escolher o caminho para verificação de integridade:`/` e o protocolo:`HTTP`.
+ - Realizar registro das instâncias.
+
+### Modelos de execução
+
+Para o modelo de execução, essas são as configurações:
+ - Amazon Linux 2
+ - t2.micro
+ - "Par de chaves" criada para a atividade
+ - Grupo de segurança seguindo o especificado nas seções anteriores
+ - Armazenamento do tipo GP2 com 8GB
+ - Utiliza um script de user_data para o modelo que sera uisado na sub-rede: `aws-docker-1a`
+ - E no caso da do modelo que sera usado na sub-rede: `aws-docker-1b` sera usado o user_data2
+
+## Autoscaling
+
+Para criar o autoscaling usaremos os modelos de execução criados anteriormente
+
+A configuração do autoscaling segue essas etapas:
+ - Ir para a seção de "Grupos do Auto Scaling
+ - Clicar em "criar grupo do Auto Scaling"
+ - Inserir nome do 
+ - Selecionar o launcher template criado
+ - Selecionar a VPC adequada
+ - Selecionar as subnets privadas que as instâncias serão criadas
+ - Em balanceador de carga, pode-se selecionar o já criado, ou criar posteriormente
+ - Habilitar coleta de métricas de grupo no CloudWatch ( É opcional )
+ - Selecionar a capacidade desejada, mínima e máxima como 2 
+
