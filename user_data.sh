@@ -1,41 +1,61 @@
 #!/bin/bash
 
+# Variáveis
+EFS_VOLUME="/mnt/efs"
+WORDPRESS_VOLUME="/var/www/html"
+DATABASE_HOST="aws-docker1.c7i4k6wwgmzc.us-east-1.rds.amazonaws.com"
+DATABASE_USER="admin"
+DATABASE_PASSWORD="admin123"
+DATABASE_NAME="aws_docker"
+
 # Atualização do sistema
 sudo yum update -y
 
-# Instalação do Docker
+# Instalação do Docker e do utilitário EFS
 sudo yum install docker -y
+sudo yum install amazon-efs-utils -y
 
-# Ativação do serviço Docker
+# Adição do usuário ao grupo Docker
+sudo usermod -aG docker $(whoami)
+
+# Inicialização e ativação do serviço Docker
 sudo systemctl start docker
 sudo systemctl enable docker
 
-# Instalação do Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+# Criação do ponto de montagem EFS
+sudo mkdir -p $EFS_VOLUME
 
-# Criação do ponto de montagem EFS (opcional)
-sudo mkdir /efs
-sudo chmod +rwx /efs
+# Montagem do volume EFS
+if ! mountpoint -q $EFS_VOLUME; then
+  echo "Montando volume EFS..."
+  sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 10.1.3.178:/ $EFS_VOLUME
+else
+  echo "Volume EFS já montado."
+fi
 
-sudo yum install amazon-efs-utils -y
+# Download do Docker Compose
+curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /bin/docker-compose
+chmod +x /bin/docker-compose
 
-sudo yum install python3-pip -y
+# Criação do arquivo docker-compose.yaml
+cat <<EOL > /home/ec2-user/docker-compose.yaml
+version: '3.8'
+services:
+  wordpress:
+    image: wordpress:latest
+    volumes:
+      - $EFS_VOLUME$WORDPRESS_VOLUME:/$WORDPRESS_VOLUME
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: $DATABASE_HOST
+      WORDPRESS_DB_USER: $DATABASE_USER
+      WORDPRESS_DB_PASSWORD: $DATABASE_PASSWORD
+      WORDPRESS_DB_NAME: $DATABASE_NAME
+EOL
 
-sudo pip3 install botocore
+# Inicialização do serviço WordPress
+docker-compose -f /home/ec2-user/docker-compose.yaml up -d
 
-# Montagem do EFS (opcional)
-# Substitua "fs-0c2450fab7143e6e8.efs.us-east-1.amazonaws.com" pelo ID do seu EFS
-sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 172.29.0.120:/ /efs
-
-# Download do arquivo docker-compose.yaml
-sudo curl -o /home/ec2-user/dockerCompose.yaml "https://raw.githubusercontent.com/igormorantos/Aws-Docker/main/docker-compose.yaml"
-
-# Adição do usuário ao grupo Docker
-sudo usermod -aG docker ${USER}
-
-# Permissão para o socket do Docker
-sudo chmod 666 /var/run/docker.sock
-
-# Execução do Docker Compose
-sudo docker-compose -f /home/ec2-user/dockerCompose.yaml up -d
+# Atualização do sistema
+yum update
