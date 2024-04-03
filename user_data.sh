@@ -56,6 +56,3 @@ EOL
 
 # Inicialização do serviço WordPress
 docker-compose -f /home/ec2-user/docker-compose.yaml up -d
-
-# Atualização do sistema
-yum update
