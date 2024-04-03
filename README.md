@@ -1,4 +1,4 @@
-# Atividade AWS – Docker
+# Infraestrutura de Aplicação Wordpress com Container na Aws
 
 ## Objetivos:
 
