@@ -49,20 +49,20 @@ utilizei a VPC `aws-docker`, usaremos 2 sub-redes, que contém a instância da a
 
 Criei uma tabela de roteamento, sendo ela para as duas sub-redes, onde vai permitir o tráfego à internet pelo gateway da internet.
 
-Criando a tabela de roteamento para sub-rede pública
-Nome: `rtb-aws-docker-public`
-VPC: `aws-docker`
+- Criando a tabela de roteamento para sub-rede pública
+- Nome: `rtb-aws-docker-public`
+- VPC: `aws-docker`
 
 Após isso devemos associar as sub-redes criadas anteriormente a tabela de roteamento.
 
 
 ## Associando as sub-redes pública a sua tabela de roteamento
 
-Selecione a tabela de roteamento, siga para associações de sub-redes e selecione Editar associações. Após isso, selecione a sub-rede pública, com nome: `aws-docker-1a` e clique salvar.
+ - Selecione a tabela de roteamento, siga para associações de sub-redes e selecione Editar associações. Após isso, selecione a sub-rede pública, com nome: `aws-docker-1a` e clique salvar.
 
-Faça o mesmo para a `aws-docker-1b`
+ - Faça o mesmo para a `aws-docker-1b`
 
-Além disso, devemos também permitir o tráfego a internet para cada sub-rede, sendo pelo gateway da internet para sub-rede pública.
+ - Além disso, devemos também permitir o tráfego a internet para cada sub-rede, sendo pelo gateway da internet para sub-rede pública.
 
 ## Configuração dos Gateways
 
@@ -117,9 +117,9 @@ Configurar 2 grupos de segurança, um para a instância e outro para o load bala
     - `Tipo da instância: t2.micro`
     - `subnet: aws-docker-1b`
 
-## Instalando as Configurações e Subindo o Container Wordpress na instância
+## Instalando as Configurações e Subindo o Container Wordpress na instância (data_user.sh)
 
-Para fazer as instalações do docker/docker-compose/efs/container-wordpress
+Para fazer as instalações do docker/docker-compose/efs/container-wordpress esse aquivo ira se alterar no ip do efs dependendo da sub-rede em que sera inserido
 
 ```#!/bin/bash
 #!/bin/bash
@@ -184,57 +184,51 @@ docker-compose -f /home/ec2-user/docker-compose.yaml up -d
 
 ## Load Balancer
 
-<h6>Passo a passo de criação do load balancer </h6>
+- Passo a passo de criação do load balancer
 
- - ` Ir para a seção de load balancers na AWS`
- - ` Clicar em criar lod balancer`
- - ` Selecionar o tipo de "Application Load Balancer"`
- - ` Escolha o nome do load balancer "aws-docker-lb"`
- - ` Selecionar o esquema "Voltado para internet`
- - ` Selecionar a VPC "aws-docker"`
- - ` Selecionar as subnets públicas de cada zona`
- - ` Selecionar grupo de segurança para o load balancer`
-
-    - `Nome: aws-docker-lb`
-    - `Esquema: voltado pra internet`
-    - `Tipo de endereço IP: IPv4`
-    - `VPC: aws-docker`
-    - `Grupo de segurança: "Load_balancer_SG"`
+ - Ir para o para o load balancers na AWS
+ - Clicar em criar lod balancer
+ - Selecionar o tipo de `Application Load Balancer`
+ - Escolha o nome do load balancer `aws-docker-lb`
+ - Selecionar o esquema `Voltado para internet`
+ - Selecionar a VPC `aws-docker`
+ - Selecionar as subnets públicas de cada zona
+ - Selecionar grupo de segurança para o load balancer `Load_balancer_SG`
 
 ## EFS
 
 Criando o Elastic File System:
 
- - `Ir em Criar sistema de arquivo`
- - `Criar nome do EFS: "efs-aws-docker"`
- - `Escolher a vpc: "aws-docker"`
+ - Ir ao Criar sistema de arquivo
+ - Criar nome do EFS: `efs-aws-docker`
+ - Escolher a vpc: `aws-docker`
 
 ## RDS
 
 O RDS foi configurado seguindo as etapas:
 
- - `Entrar em RDS.`
- - `Clicar em Criar Banco de dados`
- - `Selecionar de criação padrão`
- - `Selecionar o banco MySQL`
- - `Selecionar o modelo nível gratuito`
- - `Escolher o nome do banco de dados`
- - `Escolher nome do usuário e senha`
- - `Escolher configuração de instância foi "db.t3.micro"`
- - `Em conectividade marcar opção "não se conectar a um recurso de computação do EC2"`
- - `Escolher a VPC: aws-docker`
- - `Escolher grupo de sub-redes`
- - `Utilizar grupo de segurança criado para o RDS`
- - `Selecionar a zona de disponibilidade como "Sem preferência`
+ - Vá RDS.
+ - Clicar em Criar Banco de dados
+ - Selecionar de criação padrão
+ - Selecionar o banco MySQL
+ - Selecionar o modelo nível gratuito
+ - Escolher o nome do banco de dados
+ - Escolher nome do usuário e senha
+ - Escolher configuração de instância foi `db.t3.micro`
+ - Em conectividade marcar opção `não se conectar a um recurso de computação do EC2`
+ - Escolher a VPC: `aws-docker`
+ - Escolher grupo de sub-redes ja vem por default.
+ - Utilizar grupo de segurança: `RDS-GP`
+ - Selecionar a zona de disponibilidade como `Sem preferência`
 
 ### Grupos de destino
 
 Configurando o Grupo:
 
- -`Ir para a os grupos de destino na AWS.`
- - `Clicar em criar grupo de destino.`
- - `Na configuração básica selecionar "instâncias"`
- - `Criar um nome para o grupo de destino`
+ - Ir para a os grupos de destino na AWS.
+ - Clicar em criar grupo de destino.
+ - Na configuração básica selecionar "instâncias"
+ - Criar um nome para o grupo de destino
  - Selecionar o protocolo:`HTTP` e a porta`8080`,
  - O tipo de endereço IP será o `IPv4`
  - Escolher a VPC `aws-docker`
@@ -257,13 +251,12 @@ Para o modelo de execução, essas são as configurações:
 Para criar o autoscaling usaremos os modelos de execução criados anteriormente
 
 A configuração do autoscaling segue essas etapas:
- - Ir para a seção de "Grupos do Auto Scaling
- - Clicar em "criar grupo do Auto Scaling"
- - Inserir nome do 
- - Selecionar o launcher template criado
- - Selecionar a VPC adequada
+ - Ir em Grupos do Auto Scaling
+ - Clicar em: `criar grupo do Auto Scaling`
+ - Inserir Nome do Grupo: `aws-docker-grupo-destino`
+ - Selecionar o modelo de execução criado de acordo com cada zona
+ - Selecionar a VPC adequada: `aws-docker`
  - Selecionar as subnets privadas que as instâncias serão criadas
- - Em balanceador de carga, pode-se selecionar o já criado, ou criar posteriormente
- - Habilitar coleta de métricas de grupo no CloudWatch ( É opcional )
- - Selecionar a capacidade desejada, mínima e máxima como 2 
+ - Em balanceador de carga, pode-se selecionar o já criado
+ - Selecionar a capacidade desejada, mínima e máxima como 2 e minima como 1 
 
