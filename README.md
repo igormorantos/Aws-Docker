@@ -85,8 +85,6 @@ Selecione a tabela de roteamento, siga para rotas e selecione Editar rotas. Apó
     
 ## Criando instancias
 
-## Configuração do grupo de segurança
-
 Configurar 2 grupos de segurança, um para a instância e outro para o load balancer.
 
 - Grupo de segurança do balanceador de carga
@@ -101,7 +99,7 @@ Configurar 2 grupos de segurança, um para a instância e outro para o load bala
   2049 | TCP | Grupo de Segurança do efs
   80 | TCP | Grupo de segurança do balanceador de carga
 
-<h5>Criando as instancias Ec2 host e de aplicação.</h5>
+### Criando as instancias Ec2 host e de aplicação.
 
 - Configuração das instancias host zona de disponibilidade 1a
     - `AMI: Linux 2`
@@ -238,13 +236,13 @@ Configurando o Grupo:
 ### Modelos de execução
 
 Para o modelo de execução, essas são as configurações:
- - Amazon Linux 2
- - t2.micro
- - "Par de chaves" criada para a atividade
+ - `Amazon Linux 2`
+ - `t2.micro`
+ - `aws-docker.pem` criada para a atividade.
  - Grupo de segurança seguindo o especificado nas seções anteriores
- - Armazenamento do tipo GP2 com 8GB
- - Utiliza um script de user_data para o modelo que sera uisado na sub-rede: `aws-docker-1a`
- - E no caso da do modelo que sera usado na sub-rede: `aws-docker-1b` sera usado o user_data2
+ - Armazenamento do tipo `GP2 com 8GB`
+ - Utiliza um script de `user_data.sh` para o modelo que sera uisado na sub-rede: `aws-docker-1a`.
+ - E no caso da do modelo que sera usado na sub-rede: `aws-docker-1b` sera usado o `user_data2`.
 
 ## Autoscaling
 
