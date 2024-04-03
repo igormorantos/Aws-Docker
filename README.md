@@ -184,7 +184,7 @@ docker-compose -f /home/ec2-user/docker-compose.yaml up -d
 
 ## Load Balancer
 
-- Passo a passo de criação do load balancer
+Passo a passo de criação do load balancer:
 
  - Ir para o para o load balancers na AWS
  - Clicar em criar lod balancer
