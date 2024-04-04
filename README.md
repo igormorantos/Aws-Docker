@@ -86,6 +86,7 @@ Selecione a tabela de roteamento, siga para rotas e selecione Editar rotas. Apó
 ## Criando instancias
 
 Configurar 2 grupos de segurança, um para a instância e outro para o load balancer.
+Dessa forma impedindo assim o acesso a aplicação atraves do ip publico, acessando apenas pelo dns do load balancer. 
 
 - Grupo de segurança do balanceador de carga
   Porta | Protocolo | Origem
